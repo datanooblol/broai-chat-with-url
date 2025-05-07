@@ -1,0 +1,13 @@
+[project]
+name = "broai-chat-with-url"
+version = "0.1.0"
+description = "A quick webapp for chatting with a specified url"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "broai==0.1.13",
+    "ipykernel>=6.29.5",
+    "requests>=2.32.3",
+    "streamlit>=1.45.0",
+    "torch==2.6.0",
+]
