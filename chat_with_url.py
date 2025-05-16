@@ -8,6 +8,7 @@ from broai.prompt_management.interface import Persona
 if "model_name" not in st.session_state:
     st.session_state["model_name"] = "us.meta.llama3-2-11b-instruct-v1:0"
 
+
 prompt_dir = "./agent_prompts"
 model = BedrockOllamaChat()
 st.set_page_config(
