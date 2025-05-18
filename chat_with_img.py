@@ -1,14 +1,32 @@
 import streamlit as st
-# from package.search_utils import scrape_jina_ai
-# from broai.llm_management.ollama import BedrockOllamaChat
 from broai.prompt_management.core import PromptGenerator
 from broai.prompt_management.interface import Persona
+from PIL import Image
+import io
 import boto3
 client = boto3.client("bedrock-runtime", region_name="us-west-2")
 
 
 if "model_name" not in st.session_state:
     st.session_state["model_name"] = "us.meta.llama3-2-11b-instruct-v1:0"
+
+
+def get_image_bytes(filename):
+    MAX_PIXELS = 600 * 600  # 1 million pixels
+    # Open and resize image if needed
+    with Image.open(filename) as img:
+        while img.width * img.height > MAX_PIXELS:
+            img = img.resize((img.width // 2, img.height // 2), Image.LANCZOS)
+        # Save to in-memory buffer
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        image_bytes = buffer.getvalue()  # This is ready to send to boto3
+    return image_bytes
+
+# def get_image_bytes(filename):
+#     with open(filename, "rb") as image_file:
+#         image_bytes = image_file.read()
+#     return image_bytes
 
 
 def UserMessage(text, image_bytes=None, image_format=None):
@@ -88,8 +106,7 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("What is up?"):
     if st.session_state.filename:
-        with open(st.session_state.filename, "rb") as image_file:
-            image_bytes = image_file.read()
+        image_bytes = get_image_bytes(st.session_state.filename)
         user_msg = UserMessage(
             text=prompt,
             image_bytes=image_bytes,
