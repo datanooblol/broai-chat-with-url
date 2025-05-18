@@ -5,7 +5,7 @@ description = "A quick webapp for chatting with a specified url"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "broai==0.1.13",
+    "broai==0.1.15",
     "ipykernel>=6.29.5",
     "requests>=2.32.3",
     "streamlit>=1.45.0",

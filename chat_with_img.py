@@ -1,12 +1,13 @@
 import streamlit as st
 from broai.prompt_management.core import PromptGenerator
+from broai.llm_management.ollama import BedrockOllamaChat
 from broai.prompt_management.interface import Persona
 from PIL import Image
 import io
 import boto3
 client = boto3.client("bedrock-runtime", region_name="us-west-2")
 
-
+model = BedrockOllamaChat()
 if "model_name" not in st.session_state:
     st.session_state["model_name"] = "us.meta.llama3-2-11b-instruct-v1:0"
 
@@ -107,7 +108,7 @@ for message in st.session_state.messages:
 if prompt := st.chat_input("What is up?"):
     if st.session_state.filename:
         image_bytes = get_image_bytes(st.session_state.filename)
-        user_msg = UserMessage(
+        user_msg = model.UserMessage(
             text=prompt,
             image_bytes=image_bytes,
             image_format=st.session_state.filename.split(".")[-1]
@@ -119,12 +120,14 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             full_prompt = pg.as_prompt()
-            response = chat(
-                client,
-                model_name=st.session_state.model_name,
-                system_prompt=full_prompt,
-                messages=st.session_state.messages+[user_msg]
-            )
+            # response = chat(
+            #     client,
+            #     model_name=st.session_state.model_name,
+            #     system_prompt=full_prompt,
+            #     messages=st.session_state.messages+[user_msg]
+            # )
+            model.model_name = st.session_state.model_name
+            response = model.run(system_prompt=full_prompt, messages=st.session_state.messages+[user_msg])
             st.markdown(response)
     st.session_state.messages.append(UserMessage(text=prompt))
     st.session_state.messages.append(AIMessage(text=response))
